@@ -6,8 +6,9 @@ const connectDB = async () => {
     console.log("URI:", process.env.MONGO_URI.replace(/\/\/(.*?):(.*?)@/, "//*****:*****@"));
 
     const conn = await mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 10000,
-    });
+  serverSelectionTimeoutMS: 30000,
+  family: 4,
+});
 
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
