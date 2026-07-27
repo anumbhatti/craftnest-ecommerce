@@ -2,7 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const generateToken = require("../utils/generateToken");
 
-// Register User
+// ================= Register User =================
 const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -45,7 +45,6 @@ const registerUser = async (req, res) => {
         role: user.role,
       },
     });
-
   } catch (error) {
     res.status(500).json({
       message: error.message,
@@ -53,13 +52,17 @@ const registerUser = async (req, res) => {
   }
 };
 
-// Login User
+// ================= Login User =================
 const loginUser = async (req, res) => {
   try {
-
     const { email, password } = req.body;
 
+    console.log("Email Entered:", email);
+    console.log("Password Entered:", password);
+
     const user = await User.findOne({ email });
+
+    console.log("User Found:", user);
 
     if (!user) {
       return res.status(400).json({
@@ -67,7 +70,11 @@ const loginUser = async (req, res) => {
       });
     }
 
+    console.log("Stored Hash:", user.password);
+
     const isMatch = await bcrypt.compare(password, user.password);
+
+    console.log("Password Match:", isMatch);
 
     if (!isMatch) {
       return res.status(400).json({
@@ -86,13 +93,12 @@ const loginUser = async (req, res) => {
         role: user.role,
       },
     });
-
   } catch (error) {
+    console.log(error);
 
     res.status(500).json({
       message: error.message,
     });
-
   }
 };
 
