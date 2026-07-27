@@ -1,13 +1,20 @@
 const Category = require("../models/Category");
 
-// Add Category
-exports.addCategory = async (req, res) => {
+// Create Category
+const createCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
 
-    const exists = await Category.findOne({ name });
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        message: "Category name is required",
+      });
+    }
 
-    if (exists) {
+    const categoryExists = await Category.findOne({ name });
+
+    if (categoryExists) {
       return res.status(400).json({
         success: false,
         message: "Category already exists",
@@ -24,6 +31,7 @@ exports.addCategory = async (req, res) => {
       message: "Category created successfully",
       category,
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -33,8 +41,9 @@ exports.addCategory = async (req, res) => {
 };
 
 // Get All Categories
-exports.getCategories = async (req, res) => {
+const getCategories = async (req, res) => {
   try {
+
     const categories = await Category.find();
 
     res.status(200).json({
@@ -42,17 +51,21 @@ exports.getCategories = async (req, res) => {
       count: categories.length,
       categories,
     });
+
   } catch (error) {
+
     res.status(500).json({
       success: false,
       message: error.message,
     });
+
   }
 };
 
 // Get Single Category
-exports.getCategory = async (req, res) => {
+const getSingleCategory = async (req, res) => {
   try {
+
     const category = await Category.findById(req.params.id);
 
     if (!category) {
@@ -66,22 +79,26 @@ exports.getCategory = async (req, res) => {
       success: true,
       category,
     });
+
   } catch (error) {
+
     res.status(500).json({
       success: false,
       message: error.message,
     });
+
   }
 };
 
 // Update Category
-exports.updateCategory = async (req, res) => {
+const updateCategory = async (req, res) => {
   try {
+
     const category = await Category.findByIdAndUpdate(
       req.params.id,
       req.body,
       {
-        returnDocument: "after",
+        new: true,
         runValidators: true,
       }
     );
@@ -98,17 +115,21 @@ exports.updateCategory = async (req, res) => {
       message: "Category updated successfully",
       category,
     });
+
   } catch (error) {
+
     res.status(500).json({
       success: false,
       message: error.message,
     });
+
   }
 };
 
 // Delete Category
-exports.deleteCategory = async (req, res) => {
+const deleteCategory = async (req, res) => {
   try {
+
     const category = await Category.findById(req.params.id);
 
     if (!category) {
@@ -124,10 +145,21 @@ exports.deleteCategory = async (req, res) => {
       success: true,
       message: "Category deleted successfully",
     });
+
   } catch (error) {
+
     res.status(500).json({
       success: false,
       message: error.message,
     });
+
   }
+};
+
+module.exports = {
+  createCategory,
+  getCategories,
+  getSingleCategory,
+  updateCategory,
+  deleteCategory,
 };
