@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import {
   FaUsers,
@@ -9,6 +10,8 @@ import {
 } from "react-icons/fa";
 
 function Dashboard() {
+  const navigate = useNavigate();
+
   const [stats, setStats] = useState(null);
   const [recentOrders, setRecentOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,7 +32,6 @@ function Dashboard() {
 
       setStats(data.statistics);
       setRecentOrders(data.recentOrders);
-
     } catch (error) {
       console.log(error);
     } finally {
@@ -47,42 +49,44 @@ function Dashboard() {
 
   return (
     <div className="max-w-7xl mx-auto py-12 px-6">
-
       <h1 className="text-4xl font-bold mb-10">
         Admin Dashboard
       </h1>
 
+      {/* Admin Buttons */}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
 
-  <button
-    onClick={() => (window.location.href = "/admin/products")}
-    className="bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-xl font-semibold shadow-md transition"
-  >
-    Manage Products
-  </button>
+        <button
+          onClick={() => navigate("/admin/products")}
+          className="bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-xl font-semibold shadow-md transition"
+        >
+          Manage Products
+        </button>
 
-  <button
-    onClick={() => (window.location.href = "/admin/categories")}
-    className="bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-semibold shadow-md transition"
-  >
-    Manage Categories
-  </button>
+        <button
+          onClick={() => navigate("/admin/categories")}
+          className="bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-semibold shadow-md transition"
+        >
+          Manage Categories
+        </button>
 
-  <button
-    onClick={() => (window.location.href = "/admin/users")}
-    className="bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-xl font-semibold shadow-md transition"
-  >
-    Manage Users
-  </button>
+        <button
+          onClick={() => navigate("/admin/users")}
+          className="bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-xl font-semibold shadow-md transition"
+        >
+          Manage Users
+        </button>
 
-  <button
-    onClick={() => (window.location.href = "/admin/orders")}
-    className="bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-xl font-semibold shadow-md transition"
-  >
-    Manage Orders
-  </button>
+        <button
+          onClick={() => navigate("/admin/orders")}
+          className="bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-xl font-semibold shadow-md transition"
+        >
+          Manage Orders
+        </button>
 
-</div>
+      </div>
+
       {/* Statistics */}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
@@ -90,33 +94,25 @@ function Dashboard() {
         <div className="bg-white shadow rounded-xl p-6">
           <FaUsers className="text-4xl text-blue-500 mb-4" />
           <h3 className="text-gray-500">Users</h3>
-          <p className="text-3xl font-bold">
-            {stats.totalUsers}
-          </p>
+          <p className="text-3xl font-bold">{stats.totalUsers}</p>
         </div>
 
         <div className="bg-white shadow rounded-xl p-6">
           <FaBoxOpen className="text-4xl text-emerald-500 mb-4" />
           <h3 className="text-gray-500">Products</h3>
-          <p className="text-3xl font-bold">
-            {stats.totalProducts}
-          </p>
+          <p className="text-3xl font-bold">{stats.totalProducts}</p>
         </div>
 
         <div className="bg-white shadow rounded-xl p-6">
           <FaTags className="text-4xl text-orange-500 mb-4" />
           <h3 className="text-gray-500">Categories</h3>
-          <p className="text-3xl font-bold">
-            {stats.totalCategories}
-          </p>
+          <p className="text-3xl font-bold">{stats.totalCategories}</p>
         </div>
 
         <div className="bg-white shadow rounded-xl p-6">
           <FaShoppingCart className="text-4xl text-purple-500 mb-4" />
           <h3 className="text-gray-500">Orders</h3>
-          <p className="text-3xl font-bold">
-            {stats.totalOrders}
-          </p>
+          <p className="text-3xl font-bold">{stats.totalOrders}</p>
         </div>
 
         <div className="bg-white shadow rounded-xl p-6">
@@ -142,27 +138,12 @@ function Dashboard() {
           <table className="w-full">
 
             <thead className="bg-emerald-600 text-white">
-
               <tr>
-
-                <th className="p-4 text-left">
-                  Customer
-                </th>
-
-                <th className="p-4 text-left">
-                  Email
-                </th>
-
-                <th className="p-4 text-left">
-                  Total
-                </th>
-
-                <th className="p-4 text-left">
-                  Status
-                </th>
-
+                <th className="p-4 text-left">Customer</th>
+                <th className="p-4 text-left">Email</th>
+                <th className="p-4 text-left">Total</th>
+                <th className="p-4 text-left">Status</th>
               </tr>
-
             </thead>
 
             <tbody>
@@ -173,14 +154,9 @@ function Dashboard() {
                   key={order._id}
                   className="border-b hover:bg-gray-50"
                 >
+                  <td className="p-4">{order.user?.name}</td>
 
-                  <td className="p-4">
-                    {order.user?.name}
-                  </td>
-
-                  <td className="p-4">
-                    {order.user?.email}
-                  </td>
+                  <td className="p-4">{order.user?.email}</td>
 
                   <td className="p-4">
                     Rs. {order.totalPrice}
