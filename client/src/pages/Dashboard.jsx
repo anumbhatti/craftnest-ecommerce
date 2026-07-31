@@ -52,26 +52,37 @@ function Dashboard() {
         Admin Dashboard
       </h1>
 
-      <div className="flex gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
 
   <button
-    onClick={() => window.location.href = "/admin/products"}
-    className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg"
+    onClick={() => (window.location.href = "/admin/products")}
+    className="bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-xl font-semibold shadow-md transition"
   >
     Manage Products
   </button>
 
+  <button
+    onClick={() => (window.location.href = "/admin/categories")}
+    className="bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-semibold shadow-md transition"
+  >
+    Manage Categories
+  </button>
+
+  <button
+    onClick={() => (window.location.href = "/admin/users")}
+    className="bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-xl font-semibold shadow-md transition"
+  >
+    Manage Users
+  </button>
+
+  <button
+    onClick={() => (window.location.href = "/admin/orders")}
+    className="bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-xl font-semibold shadow-md transition"
+  >
+    Manage Orders
+  </button>
+
 </div>
-
-<button
-  onClick={() =>
-    window.location.href = "/admin/orders"
-  }
-  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg"
->
-  Manage Orders
-</button>
-
       {/* Statistics */}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">

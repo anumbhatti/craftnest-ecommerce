@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API from "../services/api";
+import { toast } from "react-toastify";
 
 function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -25,9 +26,7 @@ function AdminProducts() {
   };
 
   const deleteProduct = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this product?"
-    );
+
 
     if (!confirmDelete) return;
 
@@ -38,16 +37,16 @@ function AdminProducts() {
         },
       });
 
-      alert("Product deleted successfully.");
+      toast.success("Product deleted successfully.");
 
-      fetchProducts();
+fetchProducts();
     } catch (error) {
       console.log(error);
 
-      alert(
-        error.response?.data?.message ||
-          "Failed to delete product."
-      );
+      toast.error(
+  error.response?.data?.message ||
+  "Failed to delete product."
+);
     }
   };
 
@@ -137,14 +136,14 @@ function AdminProducts() {
 
                     <Link
                       to={`/admin/products/edit/${product._id}`}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+                      className="bg-blue-500 hover:bg-blue-600 transition duration-300 text-white px-4 py-2 rounded-lg shadow-md"
                     >
                       Edit
                     </Link>
 
                     <button
                       onClick={() => deleteProduct(product._id)}
-                      className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
+                      cclassName="bg-red-500 hover:bg-red-600 transition duration-300 text-white px-4 py-2 rounded-lg shadow-md"
                     >
                       Delete
                     </button>

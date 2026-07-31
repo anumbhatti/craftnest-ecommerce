@@ -20,6 +20,10 @@ import AdminProducts from "./pages/AdminProducts";
 import AddProduct from "./pages/AddProduct";
 import EditProduct from "./pages/EditProduct";
 import AdminOrders from "./pages/AdminOrders";
+import AdminCategories from "./pages/AdminCategories";
+import AddCategory from "./pages/AddCategory";
+import EditCategory from "./pages/EditCategory";
+import AdminUsers from "./pages/AdminUsers";
 
 function App() {
   return (
@@ -46,6 +50,15 @@ function App() {
   path="/admin/orders"
   element={<AdminOrders />}
 />
+<Route path="/admin/categories" element={<AdminCategories />} />
+
+<Route path="/admin/categories/add" element={<AddCategory />} />
+
+<Route
+  path="/admin/categories/edit/:id"
+  element={<EditCategory />}
+/>
+<Route path="/admin/users" element={<AdminUsers />} />
       </Routes>
     </MainLayout>
   );

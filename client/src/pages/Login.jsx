@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import API from "../services/api";
+import { toast } from "react-toastify";
 
 function Login() {
   const navigate = useNavigate();
@@ -9,6 +11,9 @@ function Login() {
     email: "",
     password: "",
   });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -23,21 +28,22 @@ function Login() {
     try {
       const { data } = await API.post("/auth/login", formData);
 
-      // Save Token
+      // Save Login Data
       localStorage.setItem("token", data.token);
-
-      // Save Logged-in User
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      alert(data.message);
+      toast.success(data.message || "Login Successful!");
 
-      navigate("/");
-
-      // Refresh Navbar
-      window.location.reload();
+      // Redirect after toast
+      setTimeout(() => {
+        navigate("/");
+        window.location.reload();
+      }, 1500);
 
     } catch (error) {
-      alert(error.response?.data?.message || "Login Failed");
+      toast.error(
+        error.response?.data?.message || "Login Failed"
+      );
     }
   };
 
@@ -55,25 +61,60 @@ function Login() {
             type="email"
             name="email"
             placeholder="Email"
-            className="w-full border rounded-lg p-3"
+            autoComplete="email"
+            className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-emerald-500 outline-none"
             value={formData.email}
             onChange={handleChange}
             required
           />
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            className="w-full border rounded-lg p-3"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
+          <div className="relative">
+
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              autoComplete="current-password"
+              className="w-full border rounded-lg p-3 pr-12 focus:ring-2 focus:ring-emerald-500 outline-none"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-emerald-600"
+            >
+              {showPassword ? (
+                <FaEyeSlash size={18} />
+              ) : (
+                <FaEye size={18} />
+              )}
+            </button>
+
+          </div>
+
+          <div className="flex items-center justify-between">
+
+            <label className="flex items-center gap-2 cursor-pointer text-sm">
+
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="accent-emerald-600"
+              />
+
+              Remember Me
+
+            </label>
+
+          </div>
 
           <button
             type="submit"
-            className="w-full bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700"
+            className="w-full bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition duration-300"
           >
             Login
           </button>
@@ -84,7 +125,7 @@ function Login() {
           Don't have an account?{" "}
           <Link
             to="/register"
-            className="text-emerald-600 font-semibold"
+            className="text-emerald-600 font-semibold hover:underline"
           >
             Register
           </Link>

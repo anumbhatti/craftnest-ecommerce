@@ -3,9 +3,8 @@ const Product = require("../models/Product");
 // Add Product
 const addProduct = async (req, res) => {
   try {
-    const { name, description, price, category, stock, image } = req.body;
+    const { name, description, price, category, stock } = req.body;
 
-    // Validation
     if (!name || !description || !price || !category) {
       return res.status(400).json({
         success: false,
@@ -13,7 +12,8 @@ const addProduct = async (req, res) => {
       });
     }
 
-    // Create Product
+    const image = req.file ? req.file.path : "";
+
     const product = await Product.create({
       name,
       description,
@@ -30,13 +30,14 @@ const addProduct = async (req, res) => {
     });
 
   } catch (error) {
+
     res.status(500).json({
       success: false,
       message: error.message,
     });
+
   }
 };
-
 // Get All Products
 const getProducts = async (req, res) => {
   try {
@@ -143,14 +144,7 @@ const getSingleProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
 
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    const product = await Product.findById(req.params.id);
 
     if (!product) {
       return res.status(404).json({
@@ -158,6 +152,20 @@ const updateProduct = async (req, res) => {
         message: "Product not found",
       });
     }
+
+    product.name = req.body.name || product.name;
+    product.description =
+      req.body.description || product.description;
+    product.price = req.body.price || product.price;
+    product.category =
+      req.body.category || product.category;
+    product.stock = req.body.stock || product.stock;
+
+    if (req.file) {
+      product.image = req.file.path;
+    }
+
+    await product.save();
 
     res.status(200).json({
       success: true,

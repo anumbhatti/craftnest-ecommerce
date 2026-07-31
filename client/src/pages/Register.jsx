@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { toast } from "react-toastify";
 import API from "../services/api";
 
 function Register() {
@@ -9,7 +11,11 @@ function Register() {
     name: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -21,34 +27,53 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Password Match Check
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match!");
+      return;
+    }
+
     try {
-      const { data } = await API.post("/auth/register", formData);
+      const { data } = await API.post("/auth/register", {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
 
-      // Save Token
       localStorage.setItem("token", data.token);
-
-      // Save Logged-in User
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      alert(data.message);
+      toast.success(data.message);
 
       navigate("/");
 
-      // Refresh Navbar
-      window.location.reload();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1200);
 
     } catch (error) {
-      alert(error.response?.data?.message || "Registration Failed");
+      toast.error(
+        error.response?.data?.message || "Registration Failed"
+      );
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100">
-      <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-slate-100 py-10">
 
-        <h1 className="text-3xl font-bold text-center mb-6">
-          Register
-        </h1>
+      <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-md">
+
+        <div className="text-center mb-8">
+
+          <h1 className="text-3xl font-bold text-gray-800">
+            Create Account
+          </h1>
+
+          <p className="text-gray-500 mt-2">
+            Join CraftNest and start shopping
+          </p>
+
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
 
@@ -56,7 +81,7 @@ function Register() {
             type="text"
             name="name"
             placeholder="Full Name"
-            className="w-full border rounded-lg p-3"
+            className="w-full border rounded-xl p-3 focus:ring-2 focus:ring-emerald-500 outline-none"
             value={formData.name}
             onChange={handleChange}
             required
@@ -65,43 +90,95 @@ function Register() {
           <input
             type="email"
             name="email"
-            placeholder="Email"
-            className="w-full border rounded-lg p-3"
+            placeholder="Email Address"
+            className="w-full border rounded-xl p-3 focus:ring-2 focus:ring-emerald-500 outline-none"
             value={formData.email}
             onChange={handleChange}
             required
           />
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            className="w-full border rounded-lg p-3"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
+          {/* Password */}
+
+          <div className="relative">
+
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              className="w-full border rounded-xl p-3 pr-12 focus:ring-2 focus:ring-emerald-500 outline-none"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-emerald-600"
+            >
+              {showPassword ? (
+                <FaEyeSlash size={18} />
+              ) : (
+                <FaEye size={18} />
+              )}
+            </button>
+
+          </div>
+
+          {/* Confirm Password */}
+
+          <div className="relative">
+
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              name="confirmPassword"
+              placeholder="Confirm Password"
+              className="w-full border rounded-xl p-3 pr-12 focus:ring-2 focus:ring-emerald-500 outline-none"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+            />
+
+            <button
+              type="button"
+              onClick={() =>
+                setShowConfirmPassword(!showConfirmPassword)
+              }
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-emerald-600"
+            >
+              {showConfirmPassword ? (
+                <FaEyeSlash size={18} />
+              ) : (
+                <FaEye size={18} />
+              )}
+            </button>
+
+          </div>
 
           <button
             type="submit"
-            className="w-full bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700"
+            className="w-full bg-emerald-600 text-white py-3 rounded-xl font-semibold hover:bg-emerald-700 transition duration-300"
           >
-            Register
+            Create Account
           </button>
 
         </form>
 
-        <p className="text-center mt-5">
+        <p className="text-center mt-6 text-gray-600">
+
           Already have an account?{" "}
+
           <Link
             to="/login"
-            className="text-emerald-600 font-semibold"
+            className="text-emerald-600 font-semibold hover:underline"
           >
             Login
           </Link>
+
         </p>
 
       </div>
+
     </div>
   );
 }

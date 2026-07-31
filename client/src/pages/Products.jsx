@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import API from "../services/api";
 import ProductCard from "../components/ProductCard";
 
+
 function Products() {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);

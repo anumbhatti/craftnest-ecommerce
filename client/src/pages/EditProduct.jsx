@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../services/api";
+import { toast } from "react-toastify";
 
 function EditProduct() {
   const { id } = useParams();
@@ -10,69 +11,111 @@ function EditProduct() {
 
   const [loading, setLoading] = useState(true);
 
+  const [categories, setCategories] = useState([]);
+
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    price: "",
-    category: "",
-    stock: "",
-    image: "",
-  });
+  name: "",
+  description: "",
+  price: "",
+  category: "",
+  stock: "",
+  image: null,
+});
+
+const [preview, setPreview] = useState("");
 
   useEffect(() => {
+    fetchCategories();
     fetchProduct();
   }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const { data } = await API.get("/categories");
+      setCategories(data.categories);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const fetchProduct = async () => {
     try {
       const { data } = await API.get(`/products/${id}`);
 
       setFormData({
-        name: data.product.name,
-        description: data.product.description,
-        price: data.product.price,
-        category: data.product.category,
-        stock: data.product.stock,
-        image: data.product.image,
-      });
+  name: data.product.name,
+  description: data.product.description,
+  price: data.product.price,
+  category: data.product.category,
+  stock: data.product.stock,
+  image: null,
+});
+
+setPreview(data.product.image);
     } catch (error) {
       console.log(error);
-      alert("Failed to load product.");
+      toast.error("Failed to load product.");
     } finally {
       setLoading(false);
     }
   };
 
   const handleChange = (e) => {
+  if (e.target.name === "image") {
+    setFormData({
+      ...formData,
+      image: e.target.files[0],
+    });
+
+    setPreview(URL.createObjectURL(e.target.files[0]));
+  } else {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
-  };
+  }
+};
 
   const updateProduct = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      await API.put(`/products/${id}`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  try {
 
-      alert("Product updated successfully!");
+    const productData = new FormData();
 
-      navigate("/admin/products");
+    productData.append("name", formData.name);
+    productData.append("description", formData.description);
+    productData.append("price", formData.price);
+    productData.append("category", formData.category);
+    productData.append("stock", formData.stock);
 
-    } catch (error) {
-      console.log(error);
-
-      alert(
-        error.response?.data?.message ||
-          "Update failed."
-      );
+    if (formData.image) {
+      productData.append("image", formData.image);
     }
-  };
+
+    await API.put(`/products/${id}`, productData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+   toast.success("Product updated successfully!");
+
+setTimeout(() => {
+  navigate("/admin/products");
+}, 1000);
+
+  } catch (error) {
+
+    console.log(error);
+
+    toast.error(
+  error.response?.data?.message ||
+  "Update failed."
+);
+  }
+};
 
   if (loading) {
     return (
@@ -94,70 +137,146 @@ function EditProduct() {
         className="bg-white shadow-xl rounded-xl p-8 space-y-6"
       >
 
-        <input
-          type="text"
-          name="name"
-          placeholder="Product Name"
-          value={formData.name}
-          onChange={handleChange}
-          className="w-full border rounded-lg p-3"
-        />
+        <div>
+          <label className="font-semibold">
+            Product Name
+          </label>
 
-        <textarea
-          rows="4"
-          name="description"
-          placeholder="Description"
-          value={formData.description}
-          onChange={handleChange}
-          className="w-full border rounded-lg p-3"
-        />
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            className="w-full border rounded-lg p-3 mt-2"
+          />
+        </div>
 
-        <input
-          type="number"
-          name="price"
-          placeholder="Price"
-          value={formData.price}
-          onChange={handleChange}
-          className="w-full border rounded-lg p-3"
-        />
+        <div>
+          <label className="font-semibold">
+            Description
+          </label>
 
-        <input
-          type="text"
-          name="category"
-          placeholder="Category"
-          value={formData.category}
-          onChange={handleChange}
-          className="w-full border rounded-lg p-3"
-        />
+          <textarea
+            rows="4"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            className="w-full border rounded-lg p-3 mt-2"
+          />
+        </div>
 
-        <input
-          type="number"
-          name="stock"
-          placeholder="Stock"
-          value={formData.stock}
-          onChange={handleChange}
-          className="w-full border rounded-lg p-3"
-        />
+        <div className="grid md:grid-cols-2 gap-5">
 
-        <input
-          type="text"
-          name="image"
-          placeholder="Image URL"
-          value={formData.image}
-          onChange={handleChange}
-          className="w-full border rounded-lg p-3"
-        />
+          <div>
+            <label className="font-semibold">
+              Price
+            </label>
+
+            <input
+              type="number"
+              name="price"
+              value={formData.price}
+              onChange={handleChange}
+              className="w-full border rounded-lg p-3 mt-2"
+            />
+          </div>
+
+          <div>
+            <label className="font-semibold">
+              Stock
+            </label>
+
+            <input
+              type="number"
+              name="stock"
+              value={formData.stock}
+              onChange={handleChange}
+              className="w-full border rounded-lg p-3 mt-2"
+            />
+          </div>
+
+        </div>
+
+        <div>
+
+          <label className="font-semibold">
+            Category
+          </label>
+
+          <select
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            className="w-full border rounded-lg p-3 mt-2"
+          >
+
+            <option value="">
+              Select Category
+            </option>
+
+            {categories.map((category) => (
+              <option
+                key={category._id}
+                value={category.name}
+              >
+                {category.name}
+              </option>
+            ))}
+
+          </select>
+
+        </div>
+
+        <div>
+        
+
+          <div>
+
+  <label className="font-semibold">
+    Product Image
+  </label>
+
+  <input
+    type="file"
+    name="image"
+    accept="image/*"
+    onChange={handleChange}
+    className="w-full border rounded-lg p-3 mt-2"
+  />
+
+</div>
+        </div>
 
         {formData.image && (
-          <img
-            src={formData.image}
-            alt="Preview"
-            className="w-56 h-56 rounded-lg object-cover border"
-          />
+          <div>
+
+            <p className="font-semibold mb-3">
+              Image Preview
+            </p>
+
+            {preview && (
+
+  <div>
+
+    <p className="font-semibold mb-3">
+      Current Image
+    </p>
+
+    <img
+      src={preview}
+      alt="Preview"
+      className="w-56 h-56 rounded-lg object-cover border"
+    />
+
+  </div>
+
+)}
+
+          </div>
         )}
 
         <button
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-lg text-lg"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl text-lg font-semibold"
         >
           Update Product
         </button>

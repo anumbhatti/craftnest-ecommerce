@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import API from "../services/api";
+import { toast } from "react-toastify";
 
 import { useWishlist } from "../context/WishlistContext";
 import { useCart } from "../context/CartContext";
 
 function Wishlist() {
-  const navigate = useNavigate();
-
   const { fetchWishlistCount } = useWishlist();
   const { fetchCartCount } = useCart();
 
@@ -29,9 +27,9 @@ function Wishlist() {
       });
 
       setWishlist(data.wishlist);
-
     } catch (error) {
       console.log(error);
+      toast.error("Failed to load wishlist.");
     } finally {
       setLoading(false);
     }
@@ -49,8 +47,15 @@ function Wishlist() {
       fetchWishlist();
       fetchWishlistCount();
 
+      toast.success("Item removed from wishlist.");
+
     } catch (error) {
       console.log(error);
+
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to remove item."
+      );
     }
   };
 
@@ -80,10 +85,15 @@ function Wishlist() {
       fetchWishlistCount();
       fetchCartCount();
 
-      alert("Moved to Cart!");
+      toast.success("Product moved to cart!");
 
     } catch (error) {
       console.log(error);
+
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to move product."
+      );
     }
   };
 
@@ -146,14 +156,14 @@ function Wishlist() {
 
                 <button
                   onClick={() => moveToCart(item)}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg transition duration-300 shadow"
                 >
                   Move To Cart
                 </button>
 
                 <button
                   onClick={() => removeWishlist(item._id)}
-                  className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg"
+                  className="bg-gray-600 hover:bg-gray-700 text-white px-5 py-2 rounded-lg transition duration-300 shadow"
                 >
                   Remove
                 </button>

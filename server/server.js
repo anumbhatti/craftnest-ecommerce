@@ -10,6 +10,7 @@ const orderRoutes = require("./routes/orderRoutes");
 const wishlistRoutes = require("./routes/wishlistRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/users", userRoutes);
 
 app.get("/", (req, res) => {
   res.send("CraftNest API is Running...");

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import {
   FaShoppingCart,
   FaUser,
@@ -33,47 +33,83 @@ function Navbar() {
       <div className="max-w-7xl mx-auto h-16 flex items-center justify-between px-4">
 
         <Link
-          to="/"
-          className="text-3xl font-bold text-emerald-600"
-        >
-          CraftNest
-        </Link>
+  to="/"
+  className="text-3xl font-extrabold tracking-wide"
+>
+  <span className="text-slate-900">Craft</span>
+  <span className="text-emerald-600">Nest</span>
+</Link>
 
         <nav className="hidden md:flex gap-8 font-medium">
 
-          <Link to="/" className="hover:text-emerald-600">
-            Home
-          </Link>
+          <NavLink
+  to="/"
+  className={({ isActive }) =>
+    isActive
+      ? "text-emerald-600 font-semibold"
+      : "hover:text-emerald-600 transition"
+  }
+>
+  Home
+</NavLink>
 
-          <Link to="/products" className="hover:text-emerald-600">
-            Products
-          </Link>
+          <NavLink
+  to="/products"
+  className={({ isActive }) =>
+    isActive
+      ? "text-emerald-600 font-semibold"
+      : "hover:text-emerald-600 transition"
+  }
+>
+  Products
+</NavLink>
 
-          <Link to="/about" className="hover:text-emerald-600">
-            About
-          </Link>
+          <NavLink
+  to="/about"
+  className={({ isActive }) =>
+    isActive
+      ? "text-emerald-600 font-semibold"
+      : "hover:text-emerald-600 transition"
+  }
+>
+  About
+</NavLink>
 
-          <Link to="/contact" className="hover:text-emerald-600">
-            Contact
-          </Link>
+          <NavLink
+  to="/contact"
+  className={({ isActive }) =>
+    isActive
+      ? "text-emerald-600 font-semibold"
+      : "hover:text-emerald-600 transition"
+  }
+>
+  Contact
+</NavLink>
 
           {user?.role === "admin" && (
-            <Link
-              to="/dashboard"
-              className="hover:text-emerald-600 flex items-center gap-2"
-            >
-              <FaTachometerAlt />
-              Dashboard
-            </Link>
+            <NavLink
+  to="/dashboard"
+  className={({ isActive }) =>
+    isActive
+      ? "text-emerald-600 font-semibold"
+      : "hover:text-emerald-600 transition"
+  }
+>
+  Dashboard
+</NavLink>
           )}
 
           {token && (
-            <Link
-              to="/orders"
-              className="hover:text-emerald-600"
-            >
-              My Orders
-            </Link>
+            <NavLink
+  to="/orders"
+  className={({ isActive }) =>
+    isActive
+      ? "text-emerald-600 font-semibold"
+      : "hover:text-emerald-600 transition"
+  }
+>
+  My Orders
+</NavLink>
           )}
 
         </nav>
@@ -114,7 +150,7 @@ function Navbar() {
           ) : (
             <button
               onClick={logoutHandler}
-              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 flex items-center gap-2"
+              className="border-2 border-emerald-600 text-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-600 hover:text-white transition duration-300 flex items-center gap-2"
             >
               <FaSignOutAlt />
               Logout

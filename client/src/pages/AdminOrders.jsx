@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
+import { toast } from "react-toastify";
 
 function AdminOrders() {
   const [orders, setOrders] = useState([]);
@@ -41,17 +42,17 @@ function AdminOrders() {
         }
       );
 
-      alert("Order status updated.");
+      toast.success("Order status updated successfully!");
 
       fetchOrders();
 
     } catch (error) {
       console.log(error);
 
-      alert(
-        error.response?.data?.message ||
-          "Failed to update status."
-      );
+      toast.error(
+  error.response?.data?.message ||
+  "Failed to update order."
+);
     }
   };
 

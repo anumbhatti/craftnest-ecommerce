@@ -1,66 +1,108 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
+import { toast } from "react-toastify";
 
 function AddProduct() {
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
 
+  const [categories, setCategories] = useState([]);
+
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    price: "",
-    category: "",
-    stock: "",
-    image: "",
-  });
+  name: "",
+  description: "",
+  price: "",
+  category: "",
+  stock: "",
+  image: null,
+});
 
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const { data } = await API.get("/categories");
+      setCategories(data.categories);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleChange = (e) => {
+  if (e.target.name === "image") {
+    setFormData({
+      ...formData,
+      image: e.target.files[0],
+    });
+  } else {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
-  };
+  }
+};
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (
-      !formData.name ||
-      !formData.description ||
-      !formData.price ||
-      !formData.category
-    ) {
-      alert("Please fill all required fields.");
-      return;
+  if (
+    !formData.name ||
+    !formData.description ||
+    !formData.price ||
+    !formData.category
+  ) {
+    toast.warning("Please fill all required fields.");
+return;
+  }
+
+  try {
+    setLoading(true);
+
+    const productData = new FormData();
+
+    productData.append("name", formData.name);
+    productData.append("description", formData.description);
+    productData.append("price", formData.price);
+    productData.append("category", formData.category);
+    productData.append("stock", formData.stock);
+
+    if (formData.image) {
+      productData.append("image", formData.image);
     }
 
-    try {
-      setLoading(true);
+    await API.post("/products", productData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
-      await API.post("/products", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+    toast.success("Product added successfully!");
 
-      alert("Product added successfully!");
+setTimeout(() => {
+  navigate("/admin/products");
+}, 1000);
 
-      navigate("/admin/products");
-    } catch (error) {
-      console.log(error);
+  } catch (error) {
 
-      alert(
-        error.response?.data?.message ||
-          "Failed to add product."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+    console.log(error);
+
+    toast.error(
+  error.response?.data?.message ||
+  "Failed to add product."
+);
+  } finally {
+
+    setLoading(false);
+
+  }
+};
 
   return (
     <div className="max-w-3xl mx-auto py-12 px-6">
@@ -135,18 +177,35 @@ function AddProduct() {
         </div>
 
         <div>
+
           <label className="font-semibold">
             Category
           </label>
 
-          <input
-            type="text"
+          <select
             name="category"
-            placeholder="Wood, Handmade, Decor..."
             className="w-full border rounded-lg p-3 mt-2"
             value={formData.category}
             onChange={handleChange}
-          />
+          >
+
+            <option value="">
+              Select Category
+            </option>
+
+            {categories.map((category) => (
+
+              <option
+                key={category._id}
+                value={category.name}
+              >
+                {category.name}
+              </option>
+
+            ))}
+
+          </select>
+
         </div>
 
         <div>
@@ -155,33 +214,29 @@ function AddProduct() {
           </label>
 
           <input
-            type="text"
-            name="image"
-            placeholder="https://..."
-            className="w-full border rounded-lg p-3 mt-2"
-            value={formData.image}
-            onChange={handleChange}
-          />
+  type="file"
+  name="image"
+  accept="image/*"
+  className="w-full border rounded-lg p-3 mt-2"
+  onChange={handleChange}
+/>
         </div>
 
         {formData.image && (
-          <div>
+  <div>
 
-            <p className="font-semibold mb-3">
-              Image Preview
-            </p>
+    <p className="font-semibold mb-3">
+      Image Preview
+    </p>
 
-            <img
-              src={formData.image}
-              alt="Preview"
-              className="w-56 h-56 rounded-xl object-cover border"
-              onError={(e) => {
-                e.target.style.display = "none";
-              }}
-            />
+    <img
+      src={URL.createObjectURL(formData.image)}
+      alt="Preview"
+      className="w-56 h-56 rounded-xl object-cover border"
+    />
 
-          </div>
-        )}
+  </div>
+)}
 
         <button
           disabled={loading}
